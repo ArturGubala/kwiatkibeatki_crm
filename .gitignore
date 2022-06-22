@@ -1,6 +1,9 @@
 # Virtual environment folder
 .crm
 
+# Database SQLite file
+*.sqlite3
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
