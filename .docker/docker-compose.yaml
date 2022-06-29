@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+
+  kb_crm:
+    build:
+      context: ../
+      dockerfile: app/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      db_kb_crm:
+        condition: service_healthy
+
+  db_kb_crm:
+    restart: always
+    image: postgres:14.3-alpine3.16
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    hostname: db_kb_crm
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 30s
+      retries: 6
