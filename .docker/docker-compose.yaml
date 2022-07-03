@@ -3,14 +3,16 @@ services:
 
   kb_crm:
     build:
-      context: ../
+      context: ..
       dockerfile: app/Dockerfile
     ports:
       - "5000:5000"
+    entrypoint: /kb_crm/entrypoint.sh
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_CONTAINER_NAME=${DB_CONTAINER_NAME}
     depends_on:
       db_kb_crm:
         condition: service_healthy
