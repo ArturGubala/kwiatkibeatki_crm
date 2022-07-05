@@ -13,6 +13,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - DB_CONTAINER_NAME=${DB_CONTAINER_NAME}
+      - HOST=${HOST}
     depends_on:
       db_kb_crm:
         condition: service_healthy
