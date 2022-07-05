@@ -2,6 +2,7 @@ flask
 flask_sqlalchemy
 flask_marshmallow
 flask_migrate
+marshmallow-sqlalchemy
 psycopg2-binary
 pyjwt
 python-dotenv

@@ -1,10 +1,12 @@
 from flask import Flask
 from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
 
 from .config import Configuration
 from .database import db
 
 migrate = Migrate()
+marshmallow = Marshmallow()
 
 
 def create_app():
