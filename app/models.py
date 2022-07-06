@@ -1,4 +1,5 @@
 from datetime import datetime
+from email.policy import default
 from sqlalchemy import ForeignKey
 
 from .database import db
@@ -113,7 +114,7 @@ class Catalogue(db.Model):
     alias = db.Column(db.String(length=50), unique=True)
     last_purchase_price = db.Column(db.Numeric(18, 2))
     bulk_pack_capacity = db.Column(db.Numeric(18, 2))
-    no_bulk_pack_on_palette = db.Column(db.Numeric(18, 2))
+    no_bulk_pack_on_palette = db.Column(db.Integer)
     burning_time = db.Column(db.Numeric(18, 2))
     height = db.Column(db.Numeric(18, 2))
     width = db.Column(db.Numeric(18, 2))
@@ -179,9 +180,10 @@ class Document(db.Model):
     warehouse_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
                              nullable=False)
     number = db.Column(db.String(length=50), nullable=False, unique=True)
-    date_added = db.Column(db.DateTime, nullable=False)
-    modification_date = db.Column(db.DateTime, nullable=False)
-    total = db.Column(db.String(length=50), nullable=False)
+    date_added = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    modification_date = db.Column(db.DateTime, nullable=False,
+                                  onupdate=datetime.now())
+    total = db.Column(db.Numeric(18, 2))
 
     def __init__(self, document_type_id: int, user_id: int, warehouse_id: int, number: str,
                  date_added: datetime, modification_date: datetime, total: float) -> None:
