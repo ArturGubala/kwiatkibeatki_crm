@@ -1,5 +1,5 @@
 from datetime import datetime
-from email.policy import default
+from flask_login import UserMixin
 from sqlalchemy import ForeignKey
 
 from .database import db
@@ -11,24 +11,25 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(length=50), nullable=False, unique=True)
 
-    user = db.relationship("User", backref="role", uselist=False)
+    app_user = db.relationship("AppUser", backref="role", uselist=False)
 
     def __init__(self, name: str) -> None:
         self.name = name
 
 
-class User(db.Model):
-    __tablename__ = "user"
+class AppUser(db.Model, UserMixin):
+    __tablename__ = "app_user"
 
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, ForeignKey("role.id"), nullable=False)
+    password = db.Column(db.String(length=255), nullable=False)
     name = db.Column(db.String(length=50), nullable=False, unique=True)
     surname = db.Column(db.String(length=50))
     phone_number = db.Column(db.String(length=15))
     email_address = db.Column(db.String(length=50), nullable=False,
                               unique=True)
 
-    document = db.relationship("Document", backref="user", uselist=False)
+    document = db.relationship("Document", backref="app_user", uselist=False)
 
     def __init__(self, role_id: int, name: str, surname: str, phone_number: str, email_address: str) -> None:
         self.role_id = role_id
@@ -176,7 +177,7 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     document_type_id = db.Column(db.Integer, ForeignKey("document_type.id"),
                                  nullable=False)
-    user_id = db.Column(db.Integer, ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, ForeignKey("app_user.id"), nullable=False)
     warehouse_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
                              nullable=False)
     number = db.Column(db.String(length=50), nullable=False, unique=True)
@@ -185,10 +186,10 @@ class Document(db.Model):
                                   onupdate=datetime.now())
     total = db.Column(db.Numeric(18, 2))
 
-    def __init__(self, document_type_id: int, user_id: int, warehouse_id: int, number: str,
+    def __init__(self, document_type_id: int, app_user_id: int, warehouse_id: int, number: str,
                  date_added: datetime, modification_date: datetime, total: float) -> None:
         self.document_type_id = document_type_id
-        self.user_id = user_id
+        self.app_user_id = app_user_id
         self.warehouse_id = warehouse_id
         self.number = number
         self.date_added = date_added

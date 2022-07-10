@@ -2,7 +2,7 @@ from flask_marshmallow.fields import fields
 
 from . import marshmallow
 from .models import (
-    User, Producer, BulkPackType, Catalogue,
+    AppUser, Producer, BulkPackType, Catalogue,
     DocumentType, Document, Item
 )
 
@@ -15,7 +15,7 @@ class UserSchema(marshmallow.Schema):
 
     @marshmallow.post_load
     def make_user(self, data, **kwargs) -> dict:
-        return User(**data)
+        return AppUser(**data)
 
 
 class ProducerSchema(marshmallow.Schema):
