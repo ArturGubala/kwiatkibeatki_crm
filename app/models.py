@@ -1,4 +1,5 @@
 from datetime import datetime
+from flask_login import UserMixin
 from sqlalchemy import ForeignKey
 
 from .database import db
@@ -10,24 +11,25 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(length=50), nullable=False, unique=True)
 
-    user = db.relationship("User", backref="role", uselist=False)
+    app_user = db.relationship("AppUser", backref="role", uselist=False)
 
     def __init__(self, name: str) -> None:
         self.name = name
 
 
-class User(db.Model):
-    __tablename__ = "user"
+class AppUser(db.Model, UserMixin):
+    __tablename__ = "app_user"
 
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, ForeignKey("role.id"), nullable=False)
-    name = db.Column(db.String(length=50), nullable=False, unique=True)
+    password = db.Column(db.LargeBinary(length=255), nullable=False)
+    name = db.Column(db.String(length=50), nullable=False)
     surname = db.Column(db.String(length=50))
     phone_number = db.Column(db.String(length=15))
     email_address = db.Column(db.String(length=50), nullable=False,
                               unique=True)
 
-    document = db.relationship("Document", backref="user", uselist=False)
+    document = db.relationship("Document", backref="app_user", uselist=False)
 
     def __init__(self, role_id: int, name: str, surname: str, phone_number: str, email_address: str) -> None:
         self.role_id = role_id
@@ -55,7 +57,7 @@ class Producer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(length=50), nullable=False, unique=True)
-    email_address = db.Column(db.String(length=50), nullable=False)
+    email_address = db.Column(db.String(length=50))
     phone_number = db.Column(db.String(length=50))
 
     catalogue = db.relationship("Catalogue", backref="producer", uselist=False)
@@ -113,7 +115,7 @@ class Catalogue(db.Model):
     alias = db.Column(db.String(length=50), unique=True)
     last_purchase_price = db.Column(db.Numeric(18, 2))
     bulk_pack_capacity = db.Column(db.Numeric(18, 2))
-    no_bulk_pack_on_palette = db.Column(db.Numeric(18, 2))
+    no_bulk_pack_on_palette = db.Column(db.Integer)
     burning_time = db.Column(db.Numeric(18, 2))
     height = db.Column(db.Numeric(18, 2))
     width = db.Column(db.Numeric(18, 2))
@@ -121,7 +123,7 @@ class Catalogue(db.Model):
 
     def __init__(self, measurement_unit_id: int, catalogue_type_id: int, bulk_pack_id: int,
                  producer_id: int, stock_code: str, name: str, alias: str, last_purchase_price: float,
-                 bulk_pack_capacity: float, burning_time: float, height: float, width: float,
+                 bulk_pack_capacity: float, no_bulk_pack_on_palette: int, burning_time: float, height: float, width: float,
                  diameter: float) -> None:
         self.measurement_unit_id = measurement_unit_id
         self.catalogue_type_id = catalogue_type_id
@@ -132,6 +134,7 @@ class Catalogue(db.Model):
         self.alias = alias
         self.last_purchase_price = last_purchase_price
         self.bulk_pack_capacity = bulk_pack_capacity
+        self.no_bulk_pack_on_palette = no_bulk_pack_on_palette
         self.burning_time = burning_time
         self.height = height
         self.width = width
@@ -175,18 +178,19 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     document_type_id = db.Column(db.Integer, ForeignKey("document_type.id"),
                                  nullable=False)
-    user_id = db.Column(db.Integer, ForeignKey("user.id"), nullable=False)
+    user_id = db.Column(db.Integer, ForeignKey("app_user.id"), nullable=False)
     warehouse_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
                              nullable=False)
     number = db.Column(db.String(length=50), nullable=False, unique=True)
-    date_added = db.Column(db.DateTime, nullable=False)
-    modification_date = db.Column(db.DateTime, nullable=False)
-    total = db.Column(db.String(length=50), nullable=False)
+    date_added = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    modification_date = db.Column(db.DateTime, nullable=False,
+                                  onupdate=datetime.now())
+    total = db.Column(db.Numeric(18, 2))
 
-    def __init__(self, document_type_id: int, user_id: int, warehouse_id: int, number: str,
+    def __init__(self, document_type_id: int, app_user_id: int, warehouse_id: int, number: str,
                  date_added: datetime, modification_date: datetime, total: float) -> None:
         self.document_type_id = document_type_id
-        self.user_id = user_id
+        self.app_user_id = app_user_id
         self.warehouse_id = warehouse_id
         self.number = number
         self.date_added = date_added

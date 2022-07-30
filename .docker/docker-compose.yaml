@@ -7,7 +7,7 @@ services:
       dockerfile: app/Dockerfile
     ports:
       - "5000:5000"
-    entrypoint: /kb_crm/entrypoint.sh
+    entrypoint: ./entrypoint.sh
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
