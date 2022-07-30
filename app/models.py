@@ -22,8 +22,8 @@ class AppUser(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     role_id = db.Column(db.Integer, ForeignKey("role.id"), nullable=False)
-    password = db.Column(db.String(length=255), nullable=False)
-    name = db.Column(db.String(length=50), nullable=False, unique=True)
+    password = db.Column(db.LargeBinary(length=255), nullable=False)
+    name = db.Column(db.String(length=50), nullable=False)
     surname = db.Column(db.String(length=50))
     phone_number = db.Column(db.String(length=15))
     email_address = db.Column(db.String(length=50), nullable=False,
@@ -57,7 +57,7 @@ class Producer(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(length=50), nullable=False, unique=True)
-    email_address = db.Column(db.String(length=50), nullable=False)
+    email_address = db.Column(db.String(length=50))
     phone_number = db.Column(db.String(length=50))
 
     catalogue = db.relationship("Catalogue", backref="producer", uselist=False)
@@ -123,7 +123,7 @@ class Catalogue(db.Model):
 
     def __init__(self, measurement_unit_id: int, catalogue_type_id: int, bulk_pack_id: int,
                  producer_id: int, stock_code: str, name: str, alias: str, last_purchase_price: float,
-                 bulk_pack_capacity: float, burning_time: float, height: float, width: float,
+                 bulk_pack_capacity: float, no_bulk_pack_on_palette: int, burning_time: float, height: float, width: float,
                  diameter: float) -> None:
         self.measurement_unit_id = measurement_unit_id
         self.catalogue_type_id = catalogue_type_id
@@ -134,6 +134,7 @@ class Catalogue(db.Model):
         self.alias = alias
         self.last_purchase_price = last_purchase_price
         self.bulk_pack_capacity = bulk_pack_capacity
+        self.no_bulk_pack_on_palette = no_bulk_pack_on_palette
         self.burning_time = burning_time
         self.height = height
         self.width = width

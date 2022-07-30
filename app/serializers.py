@@ -1,4 +1,5 @@
 from flask_marshmallow.fields import fields
+from marshmallow import post_load
 
 from . import marshmallow
 from .models import (
@@ -13,7 +14,7 @@ class UserSchema(marshmallow.Schema):
     phone_number = fields.Str()
     email_address = fields.Email()
 
-    @marshmallow.post_load
+    @post_load
     def make_user(self, data, **kwargs) -> dict:
         return AppUser(**data)
 
@@ -23,7 +24,7 @@ class ProducerSchema(marshmallow.Schema):
     email_address = fields.Email()
     phone_number = fields.Str()
 
-    @marshmallow.post_load
+    @post_load
     def make_producer(self, data, **kwargs) -> dict:
         return Producer(**data)
 
@@ -32,7 +33,7 @@ class BulkPackTypeSchema(marshmallow.Schema):
     name = fields.Str()
     abbreviation = fields.Str()
 
-    @marshmallow.post_load
+    @post_load
     def make_bulk_pack_type(self, data, **kwargs) -> dict:
         return BulkPackType(**data)
 
@@ -50,10 +51,10 @@ class CatalogueSchema(marshmallow.Schema):
     no_bulk_pack_on_palette = fields.Int()
     burning_time = fields.Float()
     height = fields.Float()
-    width = fields.Float
-    diameter = fields.Float
+    width = fields.Float()
+    diameter = fields.Float()
 
-    @marshmallow.post_load
+    @post_load
     def make_catalogue(self, data, **kwargs) -> dict:
         return Catalogue(**data)
 
@@ -63,7 +64,7 @@ class DocumentTypeSchema(marshmallow.Schema):
     abbreviation = fields.Str()
     numeration_template = fields.Str()
 
-    @marshmallow.post_load
+    @post_load
     def make_document_type(self, data, **kwargs) -> dict:
         return DocumentType(**data)
 
@@ -75,7 +76,7 @@ class DocumentSchema(marshmallow.Schema):
     number = fields.Str()
     total = fields.Decimal()
 
-    @marshmallow.post_load
+    @post_load
     def make_document(self, data, **kwargs) -> dict:
         return Document(**data)
 
@@ -87,6 +88,6 @@ class ItemSchema(marshmallow.Schema):
     price = fields.Decimal()
     price = fields.Float()
 
-    @marshmallow.post_load
+    @post_load
     def make_item(self, data, **kwargs) -> dict:
         return Item(**data)

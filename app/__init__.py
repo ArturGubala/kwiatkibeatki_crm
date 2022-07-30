@@ -3,6 +3,7 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+# from flask_wtf.csrf import CSRFProtect
 
 from .config import Configuration
 from .database import db
@@ -11,6 +12,7 @@ migrate = Migrate()
 marshmallow = Marshmallow()
 login_manager = LoginManager()
 bcrypt = Bcrypt()
+# csrf = CSRFProtect()
 
 
 def create_app():
@@ -21,15 +23,18 @@ def create_app():
 
     migrate.init_app(app=app, db=db)
     login_manager.init_app(app)
+    # csrf.init_app(app)
 
     from .views import (
         LoginView,
+        LogoutView,
         DashboardView,
         CatalogueView,
         ProfileView
     )
 
     app.add_url_rule("/", view_func=LoginView.as_view("login_view"))
+    app.add_url_rule("/logout", view_func=LogoutView.as_view("logout_view"))
     app.add_url_rule("/dashboard",
                      view_func=DashboardView.as_view("dashboard_view"))
     app.add_url_rule("/catalogue",
