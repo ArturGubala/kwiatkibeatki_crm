@@ -228,3 +228,18 @@ class ProfileView(MethodView):
                                   MessageLevel.WARNING)
 
         return render_template(self.template_name, current_user=current_user, data_form=data_form, password_form=password_form)
+
+
+class DocumentView(MethodView):
+    methods = ["GET", "POST"]
+
+    def __init__(self) -> None:
+        self.template_name = "document.html"
+
+    @ login_manager.unauthorized_handler
+    def unauthorized_callback():
+        return redirect('/?next=' + request.path)
+
+    @ login_required
+    def get(self):
+        return render_template(self.template_name)
