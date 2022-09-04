@@ -1,6 +1,6 @@
 {% extends "base.html" %}{% block title %} Login {% endblock %}
 {% block content %}
-<section class="section is-title-bar">
+<!-- <section class="section is-title-bar">
   <div class="level">
     <div class="level-left">
       <div class="level-item">
@@ -21,14 +21,14 @@
       </div>
     </div>
   </div>
-</section>
-<section class="hero is-hero-bar">
+</section> -->
+<!-- <section class="hero is-hero-bar">
   <div class="hero-body">
     <div class="level">
       <div class="level-left">
         <div class="level-item">
           <h1 class="title">
-            Profile
+            Profil
           </h1>
         </div>
       </div>
@@ -37,7 +37,7 @@
       </div>
     </div>
   </div>
-</section>
+</section> -->
 <section class="section is-main-section">
   <div class="tile is-ancestor">
     <div class="tile is-parent">
@@ -45,7 +45,7 @@
         <header class="card-header">
           <p class="card-header-title">
             <span class="icon"><i class="mdi mdi-account default"></i></span>
-            Profile
+            Profil
           </p>
         </header>
         <div class="card-content">
@@ -88,7 +88,7 @@
         <header class="card-header">
           <p class="card-header-title">
             <span class="icon"><i class="mdi mdi-account-circle default"></i></span>
-            Edit Profile
+            Edytuj profil
           </p>
         </header>
         <div class="card-content">
@@ -172,7 +172,7 @@
     <header class="card-header">
       <p class="card-header-title">
         <span class="icon"><i class="mdi mdi-lock default"></i></span>
-        Change Password
+        Zmień hasło
       </p>
     </header>
     <div class="card-content">
@@ -180,35 +180,42 @@
         {{ password_form.csrf_token }}
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Current password</label>
+            <label class="label">Obecne hasło*</label>
           </div>
           <div class="field-body">
             <div class="field">
               {{ password_form.current_password(class="input")}}
-              <p class="help">Required. Your current password</p>
+              <p class="help">Obecne hasło</p>
             </div>
           </div>
         </div>
         <hr>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">New password</label>
+            <label class="label">Nowe hasło*</label>
           </div>
           <div class="field-body">
             <div class="field">
               {{ password_form.new_password(class="input")}}
-              <p class="help">Required. New password</p>
+              <p class="help">Nowe hasło</p>
             </div>
           </div>
         </div>
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">Confirm password</label>
+            <label class="label">Potwierdź nowe hasło*</label>
           </div>
           <div class="field-body">
             <div class="field">
               {{ password_form.repeated_new_password(class="input")}}
-              <p class="help">Required. New password one more time</p>
+              <p class="help">Podaj nowe hasło jeszcze raz</p>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <p class="help">*Pole wymagane</p>
             </div>
           </div>
         </div>

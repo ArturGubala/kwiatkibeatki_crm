@@ -1,6 +1,6 @@
 from datetime import datetime
 from flask_login import UserMixin
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, func
 
 from .database import db
 
@@ -148,11 +148,31 @@ class Warehouse(db.Model):
     name = db.Column(db.String(length=100), nullable=False, unique=True)
     code = db.Column(db.String(length=10), nullable=False, unique=True)
 
-    document = db.relationship("Document", backref="warehouse", uselist=False)
+    # document_from = db.relationship(
+    #     "Document", backref="warehouse", foreign_keys='Document.warehouse_from_id', uselist=False)
+    # document_to = db.relationship(
+    #     "Document", backref="warehouse", foreign_keys='Document.warehouse_to_id', uselist=False)
 
     def __init__(self, name: str, code: str) -> None:
         self.name = name
         self.code = code
+
+
+class DocumentNumberParts(db.Model):
+    __tablename__ = "document_number_parts"
+
+    id = db.Column(db.Integer, primary_key=True)
+    warehouse_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
+                             nullable=False)
+    document_date = db.Column(db.Date, server_default=func.current_date())
+    last_document_number = db.Column(db.Integer, nullable=False)
+
+    warehouse = db.relationship(
+        "Warehouse", backref="warehouse", uselist=False, foreign_keys=[warehouse_id])
+
+    def __init__(self, warehouse_id: int, last_document_number: int) -> None:
+        self.warehouse_id = warehouse_id
+        self.last_document_number = last_document_number
 
 
 class DocumentType(db.Model):
@@ -163,13 +183,43 @@ class DocumentType(db.Model):
     abbreviation = db.Column(db.String(length=10), nullable=False, unique=True)
     numeration_template = db.Column(db.String(length=50), nullable=False)
 
-    document = db.relationship("Document", backref="document_type",
-                               uselist=False)
+    # document = db.relationship("Document", backref="document_type",
+    #    uselist = False)
 
     def __init__(self, name: str, abbreviation: str, numeration_template: str) -> None:
         self.name = name
         self.abbreviation = abbreviation
         self.numeration_template = numeration_template
+
+
+class TradePartner(db.Model):
+    __tablename__ = "trade_partner"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(length=50), nullable=False, unique=True)
+    email_address = db.Column(db.String(length=50), unique=True)
+    phone_number = db.Column(db.String(length=50))
+    street = db.Column(db.String(length=50))
+    street_number = db.Column(db.String(length=50))
+    city = db.Column(db.String(length=50))
+    post_code = db.Column(db.String(length=50))
+    nip = db.Column(db.String(length=50))
+    regon = db.Column(db.String(length=50))
+
+    # document = db.relationship("Document", backref="trade_partner",
+    #                            uselist=False)
+
+    def __init__(self, name: str, email_address: str, phone_number: str, street: str, street_number: str,
+                 city: str, post_code: str, nip: str, regon: str) -> None:
+        self.name = name
+        self.email_address = email_address
+        self.phone_number = phone_number
+        self.street = street
+        self.street_number = street_number
+        self.city = city
+        self.post_code = post_code
+        self.nip = nip
+        self.regon = regon
 
 
 class Document(db.Model):
@@ -178,20 +228,36 @@ class Document(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     document_type_id = db.Column(db.Integer, ForeignKey("document_type.id"),
                                  nullable=False)
-    user_id = db.Column(db.Integer, ForeignKey("app_user.id"), nullable=False)
-    warehouse_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
-                             nullable=False)
+    app_user_id = db.Column(db.Integer, ForeignKey(
+        "app_user.id"), nullable=False)
+    warehouse_from_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
+                                  nullable=False)
+    warehouse_to_id = db.Column(db.Integer, ForeignKey("warehouse.id"),
+                                nullable=False)
+    trade_partner_id = db.Column(db.Integer, ForeignKey("trade_partner.id"),
+                                 nullable=False)
     number = db.Column(db.String(length=50), nullable=False, unique=True)
-    date_added = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    modification_date = db.Column(db.DateTime, nullable=False,
-                                  onupdate=datetime.now())
+    date_added = db.Column(
+        db.DateTime, server_default=func.now(), nullable=True)
+    modification_date = db.Column(db.DateTime, server_onupdate=func.now())
     total = db.Column(db.Numeric(18, 2))
 
-    def __init__(self, document_type_id: int, app_user_id: int, warehouse_id: int, number: str,
-                 date_added: datetime, modification_date: datetime, total: float) -> None:
+    document_type = db.relationship(
+        "DocumentType", backref="document_type", uselist=False, foreign_keys=[document_type_id])
+    warehouse_from = db.relationship(
+        "Warehouse", backref="warehouse_from", uselist=False, foreign_keys=[warehouse_from_id])
+    warehouse_to = db.relationship(
+        "Warehouse", backref="warehouse_to", uselist=False, foreign_keys=[warehouse_to_id])
+    trade_partner = db.relationship(
+        "TradePartner", backref="trade_partner", uselist=False, foreign_keys=[trade_partner_id])
+
+    def __init__(self, document_type_id: int, app_user_id: int, warehouse_from_id: int,  warehouse_to_id: int,
+                 trade_partner_id: int, number: str, date_added: datetime, modification_date: datetime, total: float) -> None:
         self.document_type_id = document_type_id
         self.app_user_id = app_user_id
-        self.warehouse_id = warehouse_id
+        self.warehouse_from_id = warehouse_from_id
+        self.warehouse_to_id = warehouse_to_id
+        self.trade_partner_id = trade_partner_id
         self.number = number
         self.date_added = date_added
         self.modification_date = modification_date
@@ -202,13 +268,18 @@ class Item(db.Model):
     __tablename__ = "item"
 
     id = db.Column(db.Integer, primary_key=True)
-    document_id = db.Column(db.Integer, ForeignKey("document_type.id"),
+    document_id = db.Column(db.Integer, ForeignKey("document.id"),
                             nullable=False)
     catalogue_id = db.Column(db.Integer, ForeignKey("catalogue.id"),
                              nullable=False)
     quantity = db.Column(db.Numeric(18, 2), nullable=False)
-    price = db.Column(db.Numeric(18, 2), nullable=False)
-    amount = db.Column(db.Numeric(18, 2), nullable=False)
+    price = db.Column(db.Numeric(18, 2))
+    amount = db.Column(db.Numeric(18, 2))
+
+    document = db.relationship(
+        "Document", backref="document", uselist=False, foreign_keys=[document_id])
+    catalogue = db.relationship(
+        "Catalogue", backref="catalogue", uselist=False, foreign_keys=[catalogue_id])
 
     def __init__(self, document_id: int, catalogue_id: int, quantity: float, price: float,
                  amount: float) -> None:

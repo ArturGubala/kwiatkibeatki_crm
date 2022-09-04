@@ -28,7 +28,8 @@ def create_app():
         DashboardView,
         CatalogueView,
         ProfileView,
-        DocumentView
+        DocumentView,
+        AddDocumentPositionView
     )
 
     app.add_url_rule("/", view_func=LoginView.as_view("login_view"))
@@ -37,9 +38,11 @@ def create_app():
                      view_func=DashboardView.as_view("dashboard_view"))
     app.add_url_rule("/catalogue",
                      view_func=CatalogueView.as_view("catalogue_view"))
-    app.add_url_rule("/profile",
+    app.add_url_rule("/profil",
                      view_func=ProfileView.as_view("profile_view"))
     app.add_url_rule("/dokument",
                      view_func=DocumentView.as_view("document_view"))
+    app.add_url_rule("/dodaj-pozycje",
+                     view_func=AddDocumentPositionView.as_view("add_document_position_view"))
 
     return app

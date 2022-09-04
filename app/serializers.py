@@ -4,7 +4,7 @@ from marshmallow import post_load
 from . import marshmallow
 from .models import (
     AppUser, Producer, BulkPackType, Catalogue,
-    DocumentType, Document, Item
+    DocumentType, Document, Item, DocumentNumberParts
 )
 
 
@@ -71,8 +71,10 @@ class DocumentTypeSchema(marshmallow.Schema):
 
 class DocumentSchema(marshmallow.Schema):
     document_type_id = fields.Int()
-    user_id = fields.Int()
-    warehouse_id = fields.Int()
+    app_user_id = fields.Int()
+    warehouse_from_id = fields.Int()
+    warehouse_to_id = fields.Int()
+    trade_partner_id = fields.Int()
     number = fields.Str()
     total = fields.Decimal()
 
@@ -86,8 +88,20 @@ class ItemSchema(marshmallow.Schema):
     catalogue_id = fields.Int()
     quantity = fields.Float()
     price = fields.Decimal()
-    price = fields.Float()
+    amount = fields.Float()
+
+    @post_load(pass_many=True)
+    def make_item(self, data, **kwargs) -> dict:
+        items = [Item(**params) for params in data]
+
+        return items
+
+
+class DocumentNumberPartsSchema(marshmallow.Schema):
+    warehouse_id = fields.Int()
+    document_date = fields.Date()
+    last_document_number = fields.Int()
 
     @post_load
-    def make_item(self, data, **kwargs) -> dict:
-        return Item(**data)
+    def make_document_numers_parts(self, data, **kwargs) -> dict:
+        return DocumentNumberParts(**data)
