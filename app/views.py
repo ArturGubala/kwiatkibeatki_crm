@@ -236,7 +236,7 @@ class ProfileView(MethodView):
         return render_template(self.template_name, current_user=current_user, data_form=data_form, password_form=password_form)
 
 
-class DocumentView(MethodView):
+class DocumentsView(MethodView):
     methods = ["GET", "POST"]
 
     def __init__(self) -> None:
@@ -436,7 +436,7 @@ class AddDocumentPositionView(MethodView):
     @ login_required
     def get(self):
         if 'document' not in session:
-            return redirect(url_for("document_view"))
+            return redirect(url_for("documents_view"))
 
         document_position_add_form = DocumentPositionAddForm()
         confirm_cancel_document_form = ConfirmCancelDocumentForm()
@@ -485,10 +485,28 @@ class AddDocumentPositionView(MethodView):
             self.__add_positions_to_db(test=positions_data)
             db.session.commit()
             self.__clear_session('document', 'positions')
-            return redirect(url_for('document_view'))
+            return redirect(url_for('documents_view'))
         elif confirm_cancel_document_form.cancel_document.data:
             self.__clear_session('document', 'positions')
-            return redirect(url_for('document_view'))
+            return redirect(url_for('documents_view'))
 
         return render_template(self.template_name, document_position_add_form=document_position_add_form,
                                confirm_cancel_document_form=confirm_cancel_document_form, session=session)
+
+
+class DocumentView(MethodView):
+    methods = ["GET", "POST"]
+
+    def __init__(self) -> None:
+        self.template_name = "document_view.html"
+
+    @ login_manager.unauthorized_handler
+    def unauthorized_callback():
+        return redirect('/?next=' + request.path)
+
+    @ login_required
+    def get(self, document_id: int):
+
+        document = Document.query.get(document_id)
+
+        return render_template(self.template_name, document=document)

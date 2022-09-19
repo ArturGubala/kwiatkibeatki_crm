@@ -250,6 +250,7 @@ class Document(db.Model):
         "Warehouse", backref="warehouse_to", uselist=False, foreign_keys=[warehouse_to_id])
     trade_partner = db.relationship(
         "TradePartner", backref="trade_partner", uselist=False, foreign_keys=[trade_partner_id])
+    items = db.relationship("Item", back_populates="document")
 
     def __init__(self, document_type_id: int, app_user_id: int, warehouse_from_id: int,  warehouse_to_id: int,
                  trade_partner_id: int, number: str, date_added: datetime, modification_date: datetime, total: float) -> None:
@@ -277,7 +278,7 @@ class Item(db.Model):
     amount = db.Column(db.Numeric(18, 2))
 
     document = db.relationship(
-        "Document", backref="document", uselist=False, foreign_keys=[document_id])
+        "Document", uselist=False, foreign_keys=[document_id], back_populates="items")
     catalogue = db.relationship(
         "Catalogue", backref="catalogue", uselist=False, foreign_keys=[catalogue_id])
 

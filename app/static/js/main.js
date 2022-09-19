@@ -110,3 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+const documentViewBtns = document.querySelectorAll("button.document-info");
+documentViewBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const documentId = btn.dataset.documentId;
+    window.location = `/dokument/${documentId}`;
+  })
+});
