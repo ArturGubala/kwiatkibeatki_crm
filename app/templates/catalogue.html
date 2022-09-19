@@ -1,6 +1,6 @@
 {% extends "base.html" %}{% block title %} Catalogue {% endblock %}
 {% block content %}
-<section class="section is-title-bar">
+<!-- <section class="section is-title-bar">
     <div class="level">
         <div class="level-left">
             <div class="level-item">
@@ -22,7 +22,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> -->
 <section class="hero is-hero-bar">
     <div class="hero-body">
         <div class="level">
@@ -154,8 +154,9 @@
                                             </li>
                                             <li>
                                                 Ilość na palecie:
-                                                <span class="has-text-weight-semibold">{{ item.no_bulk_pack_on_palette
-                                                    }}</span>
+                                                <span class="has-text-weight-semibold">
+                                                    {{item.no_bulk_pack_on_palette}}
+                                                </span>
                                             </li>
                                         </ul>
                                     </div>

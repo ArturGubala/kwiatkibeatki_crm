@@ -69,3 +69,23 @@ class CatalogueAddForm(FlaskForm):
     width = DecimalField(validators=[validators.Optional()], places=2)
     diameter = DecimalField(validators=[validators.Optional()], places=2)
     add_product = SubmitField(label="Dodaj")
+
+
+class DocumentAddForm(FlaskForm):
+    document_type_id = SelectField(coerce=int)
+    warehouse_from_id = SelectField(coerce=int)
+    warehouse_to_id = SelectField(coerce=int)
+    trade_partner_id = SelectField(coerce=int)
+    add_document = SubmitField(label="Dodaj")
+
+
+class DocumentPositionAddForm(FlaskForm):
+    catalogue_id = SelectField(coerce=int)
+    quantity = DecimalField(places=2)
+    price = DecimalField(validators=[validators.Optional()], places=2)
+    add_document_position = SubmitField(label="Dodaj pozycję")
+
+
+class ConfirmCancelDocumentForm(FlaskForm):
+    confirm_document = SubmitField(label="Zatwierdź")
+    cancel_document = SubmitField(label="Anuluj")

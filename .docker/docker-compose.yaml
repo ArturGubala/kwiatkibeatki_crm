@@ -33,3 +33,47 @@ services:
       interval: 5s
       timeout: 30s
       retries: 6
+
+  queue_kb_crm:
+    build:
+      context: ..
+      dockerfile: queue_app/Dockerfile
+    command: [ "flask", "--app", "queue_app", "run" ]
+    ports:
+      - "5001:5001"
+    environment:
+      - BACKEND_URI=${BACKEND_URI}
+      - BROKER_URI=${BROKER_URI}
+    hostname: queue_kb_crm
+
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: queue_app/Dockerfile
+    hostname: celery_worker
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - TZ=${TZ}
+    command:
+      [
+        'celery',
+        '-A',
+        'queue_app.tasks',
+        'worker',
+        '-l',
+        'info'
+      ]
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "5672:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    environment:
+      - TZ=${TZ}
