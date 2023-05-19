@@ -1,0 +1,2 @@
+class FileSaver:
+    pass
